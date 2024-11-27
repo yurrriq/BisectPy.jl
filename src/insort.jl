@@ -27,11 +27,18 @@ end
 Insert item `x` in array `a`, and keep it sorted assuming `a` is sorted.
 
 If `x` is already in `a`, insert it to the right of the rightmost `x`.
+
 Optional args `lo` (default `1`) and `hi` (default `length(a)`) bound the
 slice of `a` to be searched.
+
+A custom `key` function can be supplied to customize the sort order.
 """
-function insort_right(a, x, lo = 1, hi = nothing)
-    lo = bisect_right(a, x, lo, hi)
+function insort_right(a, x, lo = 1, hi = nothing; key = nothing)
+    if key === nothing
+        lo = bisect_right(a, x, lo, hi)
+    else
+        lo = bisect_right(a, key(x), lo, hi, key = key)
+    end
     return insert!(a, lo, x)
 end
 
