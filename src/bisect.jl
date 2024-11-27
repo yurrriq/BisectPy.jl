@@ -64,6 +64,8 @@ insert just after the rightmost `x` already there.
 Optional args `lo` (default `1`) and `hi` (default `length(a) + 1`) bound the
 slice of `a` to be searched.
 
+A custom `key` function can be supplied to customize the sort order.
+
 # Examples
 
 ```jldoctest
@@ -77,16 +79,23 @@ julia> bisect_right([1, 2, 3, 3, 3, 5], 3)
 6
 ```
 """
-function bisect_right(a, x, lo = 1, hi = nothing)
+function bisect_right(a, x, lo = 1, hi = nothing; key = nothing)
     if lo < 1
         throw(BoundsError(a, lo))
     end
     if hi === nothing
         hi = length(a) + 1  # It's not `length(a)`!
     end
-    while lo < hi
-        mid = (lo + hi) ÷ 2
-        x < a[mid] ? hi = mid : lo = mid + 1
+    if key === nothing
+        while lo < hi
+            mid = (lo + hi) ÷ 2
+            x < a[mid] ? hi = mid : lo = mid + 1
+        end
+    else
+        while lo < hi
+            mid = (lo + hi) ÷ 2
+            x < key(a[mid]) ? hi = mid : lo = mid + 1
+        end
     end
     return lo
 end
